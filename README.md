@@ -63,7 +63,7 @@ register_mtv_middles(mtv)
 ---
 
 ### 配合pydantic进行表单解析与验证
-表单需要继承 ```SanicBaseModel``` 类，使用该类的```validate_sanic_form```并传入```request.form```
+表单验证模型需要继承 ```SanicBaseModel``` 类，使用该类的```validate_sanic_form```并传入```request.form```
 ```python
 from app.form import SanicBaseModel
 
