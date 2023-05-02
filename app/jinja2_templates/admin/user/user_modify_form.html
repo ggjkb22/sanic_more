@@ -1,0 +1,100 @@
+{% set min_psw = request.app.config.CUSTOM_MIN_PSW_LENGTH %}
+{% set max_psw = request.app.config.CUSTOM_MAX_PSW_LENGTH %}
+<h2 class="contentTitle">修改用户</h2>
+<div style="display:block; overflow:hidden; padding:0 10; line-height:21px;">
+
+	<div class="tabs">
+		<div class="tabsHeader">
+			<div class="tabsHeaderContent">
+				<ul>
+					<li class="selected"><a href="javascript:;"><span>信息</span></a></li>
+					<li><a href="javascript:;"><span>密码</span></a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="tabsContent" layoutH="100">
+            
+			<div>
+				
+				<form method="post" action="{{ request.url_for('admin.user_info_modify') }}" class="pageForm required-validate" onsubmit="return validateCallback(this, navTabAjaxDone)">
+					<div class="pageFormContent nowrap" layoutH="97">
+						<dl>
+							<dt>用户ID：</dt>
+							<dd>
+								<input type="text" name="username" maxlength="20" value="{{ user.pk }}" class="textInput readonly" />
+							</dd>
+						</dl>
+						<dl>
+							<dt>用户名：</dt>
+							<dd>
+								<input type="text" name="username" maxlength="20" value="{{ user.username }}" class="textInput readonly" />
+							</dd>
+						</dl>
+						<dl>
+							<dt>描述：</dt>
+							<dd>
+								<textarea name="description" class="textInput" cols="80" rows=6>{{ user.description }}</textarea>
+							</dd>
+						</dl>
+						<dl>
+							<dt>是否可用：</dt>
+							<dd>
+								<label><input type="radio" name="can_use" value="1" {% if user.can_use %}checked{% endif %}/>是</label>
+								<label><input type="radio" name="can_use" value="0" {% if not user.can_use %}checked{% endif %}/>否</label>
+							</dd>
+						</dl>
+					</div>
+					<div class="formBar">
+						<ul>
+							<li><div class="buttonActive"><div class="buttonContent"><button type="submit">提交</button></div></div></li>
+							<li><div class="button"><div class="buttonContent"><button type="button" class="close">取消</button></div></div></li>
+						</ul>
+					</div>
+				</form>
+				
+			</div>
+
+			<div>
+				<form method="post" action="{{ request.url_for('admin.user_psw_modify') }}" class="pageForm required-validate" onsubmit="return validateCallback(this, navTabAjaxDone)">
+					<div class="pageFormContent nowrap" layoutH="97">
+						<dl>
+							<dt>用户ID：</dt>
+							<dd>
+								<input type="text" name="username" maxlength="20" value="{{ user.pk }}" class="textInput readonly" />
+							</dd>
+						</dl>
+						<dl>
+							<dt>用户名：</dt>
+							<dd>
+								<input type="text" name="username" maxlength="20" value="{{ user.username }}" class="textInput readonly" />
+							</dd>
+						</dl>
+						<dl>
+							<dt>新密码：</dt>
+							<dd>
+								<input id="w_validation_pwd" type="password" name="password" class="required alphanumeric" minlength="{{ min_psw }}" maxlength="{{ max_psw }}" alt="字母、数字、特殊字符 {{ min_psw }}-{{ max_psw }}位"/>
+							</dd>
+						</dl>
+						<dl>
+							<dt>确认密码：</dt>
+							<dd>
+								<input type="password" name="repassword" class="required" equalto="#w_validation_pwd"/>
+							</dd>
+						</dl>
+					</div>
+					<div class="formBar">
+						<ul>
+							<li><div class="buttonActive"><div class="buttonContent"><button type="submit">提交</button></div></div></li>
+							<li><div class="button"><div class="buttonContent"><button type="button" class="close">取消</button></div></div></li>
+						</ul>
+					</div>
+				</form>
+			</div>
+
+		</div>
+		<div class="tabsFooter">
+			<div class="tabsFooterContent"></div>
+		</div>
+	</div>
+
+</div>

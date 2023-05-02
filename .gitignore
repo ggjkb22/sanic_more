@@ -2,3 +2,5 @@ sanic_virtual/
 __pycache__/
 app/conf/.env
 .idea/
+migrations/
+pyproject.toml

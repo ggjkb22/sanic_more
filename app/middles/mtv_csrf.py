@@ -5,11 +5,11 @@
 from uuid import uuid4
 from sanic.request import Request
 from app.exception.csrf_exception import MtvCsrfValidateException
-from sanic import text
 
 
 async def mtv_csrf_protect(request: Request):
-    """MTV模式下的CSRF防御
+    """已停用
+    MTV模式下的CSRF防御
     1. 当一个路由的上下文中携带csrf参数且为True时, 就能开启MTV模式下的csrf防御
     2. 如果请求方法是GET, 则在session中保存一个随机生成的csrf_token
     3. 当请求方法为POST时, 则将表单中的csrf_token与session中的csrf_token进行比对,不相等则返回CSRF验证错误

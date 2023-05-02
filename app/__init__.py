@@ -5,7 +5,6 @@
 from sanic import Sanic
 from .conf import get_config
 from .listeners import register_listener
-from .route import register_static_route
 from .bp import register_bp
 
 # 获取定制的配置
@@ -18,6 +17,6 @@ app = Sanic(name="Sanic_Portal", config=custom_config)
 register_listener(app)
 # 注册蓝图
 register_bp(app)
-# 注册静态文件路由
-register_static_route(app)
 
+# 静态文件路由
+app.static(uri="/static", file_or_directory=app.config.CUSTOM_STATIC_PATH, name="static")

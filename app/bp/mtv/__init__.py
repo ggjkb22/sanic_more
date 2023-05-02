@@ -6,10 +6,11 @@ from sanic import Blueprint
 from app.exception import register_mtv_error_handler
 from app.middles import register_mtv_middles
 from app.extends import register_session_extends
-from app.bp.form_test import ft
+from .auth import auth_bp
+from .admin import admin_bp
 
 
-mtv = Blueprint.group(ft, url_prefix="/mtv")
+mtv = Blueprint.group(auth_bp, admin_bp, url_prefix="/mtv")
 
 # 注册MTV蓝图组全局错误验证处理器
 register_mtv_error_handler(mtv)
@@ -20,3 +21,4 @@ register_session_extends(mtv)
 
 # 注册中间件
 register_mtv_middles(mtv)
+

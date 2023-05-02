@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    用户登录
+{% endblock title %}
+
+{% block head_css %}
+<link href="{{ request.url_for('static', filename='dwz/themes/css/login.css') }}" rel="stylesheet" type="text/css" />
+{% endblock head_css %}
+
+{% block head_js %}
+<!--[if lt IE 9]><script src="{{ request.url_for('static', filename='dwz/js/speedup.js') }}" type="text/javascript"></script>
+<script src="{{ request.url_for('static', filename='dwz/js/jquery-1.12.4.js') }}" type="text/javascript"></script><![endif]-->
+<!--[if gte IE 9]><!--><script src="{{ request.url_for('static', filename='dwz/js/jquery-3.4.1.js') }}" type="text/javascript"></script><!--<![endif]-->
+{% endblock head_js %}
+
+{% block body %}
+<body>
+    <div id="login">
+        <div id="login_header">
+            <h1 class="login_logo">
+                <a href="#"><img style="width:240px; height: 50px;" src="{{ request.url_for('static', filename='dwz/themes/default/images/new_login_logo.png') }}" /></a>
+            </h1>
+            <div class="login_headerContent">
+                <div class="navList">
+                    <ul>
+                        <li><a href="#">首页展示</a></li>
+                        <li><a href="#">反馈</a></li>
+                        <li><a href="#" target="_blank">帮助</a></li>
+                    </ul>
+                </div>
+                <h2 class="login_title"><img src="{{ request.url_for('static', filename='dwz/themes/default/images/new_login_title.png') }}" /></h2>
+            </div>
+        </div>
+        <div id="login_content">
+            <div class="loginForm">
+                <form action="{{ request.url_for('auth.login') }}" method="post">
+                    <p>
+                        <label>用户名：</label>
+                        <input type="text" name="username" class="login_input" required minlength="3" maxlength="20" />
+                    </p>
+                    <p>
+                        <label>密码：</label>
+                        <input type="password" name="password" class="login_input" maxlength="16"/>
+                    </p>
+                    <p>
+                        <label>验证码：</label>
+                        {% with captcha_length = request.app.config.CUSTOM_CAPTCHA_LENGTH %}
+                        <input class="code login_input" type="text" name="captcha" required minlength="{{ captcha_length }}" maxlength="{{ captcha_length }}"/><br>
+                        {% endwith %}
+                        <img id="captcha" src="{{ captcha_bs64 }}" alt="验证码" width="141" height="50" />
+                    </p>
+                    {% if error %}
+                    <p style="margin: 15px 0;">
+                        <span style="color: red; padding: 10px; font-size: 13px;">提示：{{ error }}</span>
+                    </p>
+                    {% endif %}
+                    <div class="login_bar">
+                        <input class="sub" type="submit" value="" />
+                    </div>
+                </form>
+            </div>
+            <div class="login_banner"><img style="width: 950px; height: 270px;" src="{{ request.url_for('static', filename='dwz/themes/default/images/new_login_banner4.jpg') }}" /></div>
+            <div class="login_main">
+                <ul class="helpList">
+                    <li><a href="#">用户注册</a></li>
+                    <li><a href="#">忘记密码</a></li>
+                </ul>
+            </div>
+        </div>
+        <div id="login_footer">
+            Copyright &copy; 2023 Modify By Qian.
+        </div>
+    </div>
+</body>
+{% endblock body %}
+
+{% block body_end_js %}
+<script>
+    $(function(){
+        $("#captcha").click(function(){
+            var this_self = $(this);
+            $.getJSON("{{ request.url_for('auth.captcha') }}",function(res_data, status){
+                if (status == "success"){
+                    this_self.attr("src", res_data["data"]["captcha_bs64"])
+                };
+            });
+        });
+        window.history.replaceState(null, null, window.location.href);
+    });
+</script>
+{% endblock body_end_js %}
+

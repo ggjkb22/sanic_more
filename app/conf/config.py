@@ -7,6 +7,7 @@ from typing import Optional, Dict, Union, List, Any
 from dotenv import load_dotenv, find_dotenv
 from functools import lru_cache
 from enum import IntEnum, unique
+from arq.connections import RedisSettings
 from sanic.config import Config
 
 # 读取环境变量
@@ -17,14 +18,16 @@ load_dotenv(dotenv_path=find_dotenv(), override=True)
 class RedisDbNum(IntEnum):
     """redis数据库db的枚举类"""
     session_db = 0
+    arq_work_db = 1
+    cache_db = 2
 
 
 class BaseConifg(Config):
     """ 基础配置文件
     1. 以CUSTOM开头的配置都是我们自定义的
     """
-    CUSTOM_HOST: str = os.getenv("MY_APP_HOST", "127.0.0.1")
-    CUSTOM_PORT: int = int(os.getenv("MY_APP_PORT", 8000))
+    CUSTOM_HOST: str = "127.0.0.1"
+    CUSTOM_PORT: int = 59999
     CUSTOM_DEBUG: bool = True  # 是否开启DEBUG模式
     ACCESS_LOG: bool = True  # 访问日志开关(关闭以获取最佳性能)
     AUTO_RELOAD: bool = True  # 自动重载开关
@@ -37,25 +40,46 @@ class BaseConifg(Config):
     REAL_IP_HEADER: Optional[str] = None  # 客户端真实 IP： X-Real-IP
     MOTD: bool = True  # 是否在启动时展示 MOTD 信息
     MOTD_DISPLAY: Dict[str, str] = {}  # 键/值对显示 MOTD 中的附加任意数据
-    # Session配置
-    CUSTOM_SESSION_EXPIRE_SECOND: int = 1800  # session过期时间,单位秒
-    # Redis配置
-    CUSTOM_REDIS_URL: str = os.getenv("MY_APP_REDIS_URL", "redis://127.0.0.1")  # redis的url
-    CUSTOM_REDIS_PSW: str = os.getenv("MY_APP_REDIS_PSW", "123456")  # redis的password
-    CUSTOM_REDIS_PORT: int = int(os.getenv("MY_APP_REDIS_PORT", 6379))
-    CUSTOM_REDIS_DB_ENUM: RedisDbNum = RedisDbNum  # redis db的枚举类
-    # 模板配置
-    CUSTOM_JINJA2_TEM_FORMAT: List = ["html", ]
-    CUSTOM_JINJA2_TEM_PATH: str = f"{os.getcwd()}/app/jinja2_templates"
+    # CORS配置
+    CORS_ORIGINS: str = "http://127.0.0.1"
     # 静态文件Path配置
     CUSTOM_STATIC_PATH: str = f"{os.getcwd()}/app/static"
+    # Session配置
+    CUSTOM_SESSION_EXPIRE_SECOND: int = 1800  # session和cookies过期时间,单位秒
+    # Session中的当前登录用户标识
+    CUSTOM_SESSION_CURRENT_USER: str = "current_user"
+    # MTV的登录界面与管理界面首页路由端点
+    CUSTOM_MTV_LOGIN_POINT: str = "auth.login"
+    CUSTOM_MTV_ADMIN_INDEX_POINT: str = "admin.index"
+    # 用户名密码配置(可运行时更改)
+    CUSTOM_MIN_PSW_LENGTH: int = 8  # 最小密码长度
+    CUSTOM_MAX_PSW_LENGTH: int = 20 # 最大密码长度
+    CUSTOM_PSW_CHANGE_MAX_AGE: int = 90 # 密码使用期限(到期修改)
+    CUSTOM_USER_REGEXP: str = r"^[a-zA-Z0-9_-]+$"   # 用户名正则表达式
+    CUSTOM_PSW_REGEXP: str = r"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$_%^&*-]).+$"    # 密码正则表达式
+    # 验证码配置
+    CUSTOM_CAPTCHA_WIDTH: int = 180  # 验证码宽度
+    CUSTOM_CAPTCHA_HEIGHT: int = 60  # 验证码高度
+    CUSTOM_CAPTCHA_LENGTH: int = 4  # 验证码字符个数
+    CUSTOM_CAPTCHA_FONT: str = f"{CUSTOM_STATIC_PATH}/fonts/deja.ttf"  # 验证码字体
+    # 密码加密配置
+    CUSTOM_BCRYPT_ROUNDS: int = 8  # 迭代次数,越大耗时越长(好在python的bcrypt是C库)
+    # Redis配置
+    CUSTOM_REDIS_HOST: str = "192.168.6.128"
+    CUSTOM_REDIS_URL: str = f"redis://{CUSTOM_REDIS_HOST}"  # redis的url
+    CUSTOM_REDIS_PSW: str = os.getenv("MY_APP_REDIS_PSW", "123456")  # redis的password
+    CUSTOM_REDIS_PORT: int = 16379
+    CUSTOM_REDIS_DB_ENUM: RedisDbNum = RedisDbNum  # redis db的枚举类
+    # 模板配置
+    CUSTOM_JINJA2_TEM_FORMAT: List[str] = ["html", ]  # 识别为模板的文件后缀名
+    CUSTOM_JINJA2_TEM_PATH: str = f"{os.getcwd()}/app/jinja2_templates"
     # Tortoise-ORM 配置
     CUSTOM_ORM_ENGINE: str = "tortoise.backends.mysql"  # ORM引擎
-    CUSTOM_ORM_HOST: str = os.getenv("MY_APP_ORM_HOST", "127.0.0.1")
-    CUSTOM_ORM_PORT: int = int(os.getenv("MY_APP_ORM_PORT", 3306))
+    CUSTOM_ORM_HOST: str = "192.168.6.128"
+    CUSTOM_ORM_PORT: int = 13306
     CUSTOM_ORM_USER: str = os.getenv("MY_APP_ORM_USER", "username")
     CUSTOM_ORM_PSW: str = os.getenv("MY_APP_ORM_PSW", "123456")
-    CUSTOM_ORM_DB: str = os.getenv("MY_APP_ORM_DB", "test")
+    CUSTOM_ORM_DB: str = "sanic_portal"
     CUSTOM_ORM_ECHO: bool = True  # 是否打印数据库操作信息
     CUSTOM_TORTOISE_ORM_CFG: Dict[str, Any] = {
         "connections": {
@@ -76,7 +100,7 @@ class BaseConifg(Config):
         "apps": {
             # 配置模型的相对位置,orm会自动进行查找
             "all_models": {
-                "models": ["app.orm.models.auth", "app.orm.models.article"],
+                "models": ["app.orm.models.auth.user", "aerich.models"],
                 "default_connection": "master",
             },
         },
@@ -85,6 +109,11 @@ class BaseConifg(Config):
         "use_tz": False,
         "timezone": "Asia/Shanghai",
     }
+    # arq 异步队列配置
+    CUSTOM_ARQ_REDIS_SETTINGS = RedisSettings(host=CUSTOM_REDIS_HOST,
+                                              password=CUSTOM_REDIS_PSW,
+                                              port=CUSTOM_REDIS_PORT,
+                                              database=CUSTOM_REDIS_DB_ENUM.arq_work_db.value)
 
 
 class DevConfig(BaseConifg):

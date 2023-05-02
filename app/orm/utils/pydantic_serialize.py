@@ -38,3 +38,22 @@ class TOrmSerialize:
         if return_type == "dict":
             return result.dict()
         return result.json()
+
+
+async def t_instance_serialize(t_model: Type['TModel'], instance: TModel, *,
+                               exclude: Tuple[str, ...] = (), include: Tuple[str, ...] = (),
+                               computed: Tuple[str, ...] = (), return_type: str = "dict") -> Union[Dict, str]:
+    """序列化ORM实例的工厂函数"""
+    temp_serialize = TOrmSerialize(t_model, exclude=exclude, include=include, computed=computed)
+    return await temp_serialize.from_torm_instance(instance, return_type=return_type)
+
+
+async def t_queryset_serialize(t_model: Type['TModel'], queryset: QuerySet, *,
+                               exclude: Tuple[str, ...] = (), include: Tuple[str, ...] = (),
+                               computed: Tuple[str, ...] = (), return_type: str = "dict") -> Union[Dict, str]:
+    """序列化ORM 的queryset的工厂函数"""
+    temp_serialize = TOrmSerialize(t_model, exclude=exclude, include=include, computed=computed)
+    res = await temp_serialize.from_torm_queryset(queryset, return_type=return_type)
+    if return_type == "dict":
+        return res["__root__"]
+    return res
