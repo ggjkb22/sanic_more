@@ -115,7 +115,7 @@
 				var parent = node.parent().prev();
 				var checked = 'unchecked';
 				if(op.ckbox) {
-					if($(">.checked",parent).length > 0) checked = 'checked';
+					if($(">.checked",parent).length > 0) checked = 'unchecked';
 				}
 				if (tree.length>0) {
 					node.children(":first").wrap("<div></div>");
@@ -190,19 +190,19 @@
 				var rClass = cked?"checked":"unchecked";
 				ckbox.removeClass(rClass).removeClass(!cked?"indeterminate":"").addClass(aClass);
 				$("input", ckbox).attr("checked", !cked);
-				$(">ul", node).find("li").each(function(){
-					var box = $("div.ckbox", this);
-					box.removeClass(rClass).removeClass(!cked?"indeterminate":"").addClass(aClass)
-					   .find("input").attr("checked", !cked);
-				});
-				$(node)._checkParent();
+				// $(">ul", node).find("li").each(function(){
+				// 	var box = $("div.ckbox", this);
+				// 	box.removeClass(rClass).removeClass(!cked?"indeterminate":"").addClass(aClass)
+				// 	   .find("input").attr("checked", !cked);
+				// });
+				// $(node)._checkParent();
 				return false;
 			});
 			var cAttr = $input.attr("checked") || false;
 			if (cAttr) {
 				ckbox.find("input").attr("checked", true);
 				ckbox.removeClass("unchecked").addClass("checked");
-				$(node)._checkParent();
+				// $(node)._checkParent();
 			}
 		},
 		_checkParent:function(){

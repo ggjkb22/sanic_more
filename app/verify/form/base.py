@@ -18,7 +18,10 @@ class SanicFormBaseModel(BaseModel):
     """
     @classmethod
     def validate_sanic_form(cls: Type[ValidateModel], request: Request) -> Tuple[bool, Union[ValidateModel, Dict[str, str]]]:
-        """解析sanic的form"""
+        """
+        解析sanic的form
+        解析失败则返回错误信息, 解析成功则返回pydantic实例
+        """
         # 验证csrf_token
         validate_csrf_token(request)
         sanic_form = request.form
@@ -67,4 +70,5 @@ class SanicFormBaseModel(BaseModel):
             "type_error.pyobject": "请确保此值包含有效的导入路径或有效的可调用对象:{error_message}",
             "path.not_a_directory": "该路径不是一个目录: '{path}'",
             "path.not_a_file": "该路径不是一个文件: '{path}'",
+            "value_error.number.not_gt": "该值必须大于{limit_value}",
         }

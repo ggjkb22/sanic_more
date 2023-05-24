@@ -1,0 +1,71 @@
+{% from "macro.html" import menu_permissions_recursion %}
+<h2 class="contentTitle">修改角色</h2>
+
+<div class="pageContent">
+
+	<form method="post" action="{{ request.url_for('admin.role_modify') }}" class="pageForm required-validate" onsubmit="return validateCallback(this, navTabAjaxDone)">
+		<div class="pageFormContent nowrap" layoutH="97">
+            <dl>
+                <dt>用户ID：</dt>
+                <dd>
+                    <input type="text" name="role_id" value="{{ role.pk }}" class="textInput"
+                           readonly="true"/>
+                </dd>
+            </dl>
+			<dl>
+				<dt>角色名：</dt>
+				<dd>
+					<input type="text" name="name" value="{{ role.name }}" maxlength="20" class="required" />
+				</dd>
+			</dl>
+            <dl>
+				<dt>描述：</dt>
+				<dd>
+                    <textarea name="description" class="textInput" value="{{ role.description | default('', boolean=True) }}" cols="80" rows=6></textarea>
+				</dd>
+			</dl>
+            <dl>
+				<dt>权限：</dt>
+				<dd>
+					<div class="accordion" style="width:500px;float:left;">
+						<div class="accordionHeader">
+							<h2><span>icon</span>菜单权限</h2>
+						</div>
+						<div class="accordionContent">
+							<ul class="tree treeFolder treeCheck collapse" style="height:550px;">
+                                {{ menu_permissions_recursion(all_menu_permissions, checked_list=current_role_menu_permissions) }}
+							</ul>
+						</div>
+						<div class="accordionHeader">
+							<h2><span>icon</span>发布权限</h2>
+						</div>
+						<div class="accordionContent">
+							<ul class="tree treeFolder treeCheck">
+								<li><a tname="publish_permission" tvalue="1" title="发布权限测试1">发布权限测试1</a>
+									<ul>
+										<li><a tname="publish_permission" tvalue="1.1" title="发布权限测试1.1">发布权限测试1.1</a></li>
+									</ul>
+								</li>
+							</ul>
+						</div>
+						<div class="accordionHeader">
+							<h2><span>icon</span>终审权限</h2>
+						</div>
+						<div class="accordionContent">
+							<ul class="tree treeFolder treeCheck">
+								<li><a tname="last_instance_permission" tvalue="1" title="终审权限测试1">终审权限测试阿三是卡的时间的撒按时课件撒撒看见的是撒娇的撒娇的撒活动空间撒谎的会计恒等式打撒打撒撒旦大大萨达萨达萨达是1</a></li>
+							</ul>
+						</div>
+					</div>
+				</dd>
+			</dl>
+		</div>
+		<div class="formBar">
+			<ul>
+				<li><div class="buttonActive"><div class="buttonContent"><button type="submit">提交</button></div></div></li>
+				<li><div class="button"><div class="buttonContent"><button type="button" class="close">取消</button></div></div></li>
+			</ul>
+		</div>
+	</form>
+
+</div>

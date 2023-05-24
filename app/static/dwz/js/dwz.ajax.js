@@ -167,6 +167,9 @@ function navTabAjaxDone(json){
 		};
 		if ("forwardError" == json.callbackType) {
 			alertMsg.error(json.errorMsg || "出现错误了,但研发人员并未给出明确提示")
+			if (json.redirectUrl){
+				window.location.replace(json.redirectUrl);
+			};
 		};
 	}
 }
@@ -182,7 +185,11 @@ function dialogAjaxDone(json){
 	DWZ.ajaxDone(json);
 	if (json[DWZ.keys.statusCode] == DWZ.statusCode.ok){
 		if (json.navTabId){
-			navTab.reload(json.forwardUrl, {navTabId: json.navTabId});
+			if ("get" == json.reloadMethod){
+				navTab.reloadGet("", {navTabId: json.navTabId});
+			}else{
+				navTab.reload(json.forwardUrl, {navTabId: json.navTabId});
+			}
 		} else {
 			var $pagerForm = $("#pagerForm", navTab.getCurrentPanel());
 			var args = $pagerForm.length>0 ? $pagerForm.serializeArray() : {}
@@ -190,7 +197,33 @@ function dialogAjaxDone(json){
 		}
 		if ("closeCurrent" == json.callbackType) {
 			$.pdialog.closeCurrent();
-		}
+		} else if ("forward" == json.callbackType) {
+			navTab.reload(json.forwardUrl);
+		} else if ("forwardConfirm" == json.callbackType) {
+			alertMsg.confirm(json.confirmMsg || DWZ.msg("forwardConfirmMsg"), {
+				okCall: function(){
+					navTab.reload(json.forwardUrl);
+				},
+				cancelCall: function(){
+					$.pdialog.closeCurrent();
+				}
+			});
+		} 
+	} else if (json[DWZ.keys.statusCode] == DWZ.statusCode.validateError){
+		if (json.validateError) {
+			for (error in json.validateError){
+				jqStr = "input[name=" + "'" + error + "'" + "]" + "," + "textarea[name=" + "'" + error + "'" + "]";
+				$(jqStr).addClass("error");
+				errSpan = "<span class=\"error\">" + json.validateError[error] +"</span>";
+				$(jqStr).after(errSpan);
+			};
+		};
+		if ("forwardError" == json.callbackType) {
+			alertMsg.error(json.errorMsg || "出现错误了,但研发人员并未给出明确提示")
+			if (json.redirectUrl){
+				window.location.replace(json.redirectUrl);
+			};
+		};
 	}
 }
 

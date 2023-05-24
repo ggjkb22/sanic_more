@@ -21,12 +21,19 @@ class RedisDbNum(IntEnum):
     arq_work_db = 1
     cache_db = 2
 
+@unique
+class LoginFieldLockPolicy(IntEnum):
+    """用户登录失败锁定策略"""
+    no_lock = 0     # 不锁定
+    lock_ip_user = 1   # 锁定IP与用户
+    lock_ip = 2     # 锁定IP
+
 
 class BaseConifg(Config):
     """ 基础配置文件
     1. 以CUSTOM开头的配置都是我们自定义的
     """
-    CUSTOM_HOST: str = "127.0.0.1"
+    CUSTOM_HOST: str = "0.0.0.0"
     CUSTOM_PORT: int = 59999
     CUSTOM_DEBUG: bool = True  # 是否开启DEBUG模式
     ACCESS_LOG: bool = True  # 访问日志开关(关闭以获取最佳性能)
@@ -36,27 +43,36 @@ class BaseConifg(Config):
     FALLBACK_ERROR_FORMAT: str = "html"  # 异常的返回格式
     FORWARDED_SECRET: Optional[str] = os.getenv("MY_APP_FORWARDED_SECRET", "abcd_1234")  # 代理的安全码(用于安全地识别特定的代理服务器)
     NOISY_EXCEPTIONS: bool = False  # 强制禁止异常输出
-    PROXIES_COUNT: Optional[int] = None  # 应用程序前代理服务器的数量
-    REAL_IP_HEADER: Optional[str] = None  # 客户端真实 IP： X-Real-IP
     MOTD: bool = True  # 是否在启动时展示 MOTD 信息
     MOTD_DISPLAY: Dict[str, str] = {}  # 键/值对显示 MOTD 中的附加任意数据
+    # 代理配置
+    PROXIES_COUNT: Optional[int] = None  # 应用程序前代理服务器的数量
+    REAL_IP_HEADER: Optional[str] = None  # 客户端真实 IP： X-Real-IP
+    # 应用名称
+    CUSTOM_APP_NAME = "SanicPortal"
     # CORS配置
     CORS_ORIGINS: str = "http://127.0.0.1"
     # 静态文件Path配置
     CUSTOM_STATIC_PATH: str = f"{os.getcwd()}/app/static"
-    # Session配置
-    CUSTOM_SESSION_EXPIRE_SECOND: int = 1800  # session和cookies过期时间,单位秒
     # Session中的当前登录用户标识
     CUSTOM_SESSION_CURRENT_USER: str = "current_user"
     # MTV的登录界面与管理界面首页路由端点
     CUSTOM_MTV_LOGIN_POINT: str = "auth.login"
     CUSTOM_MTV_ADMIN_INDEX_POINT: str = "admin.index"
+    # 初始管理员用户名与密码
+    CUSTOM_DEFAULT_ADMIN_USERNAME: str = os.getenv("MY_APP_DEFAULT_ADMIN_USERNAME", "qrj")
+    CUSTOM_DEFAULT_ADMIN_PSW: str = os.getenv("MY_APP_DEFAULT_ADMIN_PSW", "hello_qrj")
+    # 系统配置
+    CUSTOM_APP_SETTINGS_KEY: str = "custom_app_settings"  # redis中系统配置的键名
+    # Session配置(可运行时更改)
+    CUSTOM_SESSION_DEFAULT_MAX_AGE = 30  # 默认的session过期时间(分钟)
     # 用户名密码配置(可运行时更改)
-    CUSTOM_MIN_PSW_LENGTH: int = 8  # 最小密码长度
-    CUSTOM_MAX_PSW_LENGTH: int = 20 # 最大密码长度
-    CUSTOM_PSW_CHANGE_MAX_AGE: int = 90 # 密码使用期限(到期修改)
-    CUSTOM_USER_REGEXP: str = r"^[a-zA-Z0-9_-]+$"   # 用户名正则表达式
-    CUSTOM_PSW_REGEXP: str = r"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$_%^&*-]).+$"    # 密码正则表达式
+    CUSTOM_DEFAULT_MIN_PSW_LENGTH: int = 8  # 默认最小密码长度
+    CUSTOM_DEFAULT_MAX_PSW_LENGTH: int = 16  # 默认最大密码长度
+    CUSTOM_DEFAULT_PSW_CHANGE_MAX_AGE: int = 90  # 默认密码使用期限(天)
+    # 用户登录失败锁定配置(可运行时更改)
+    CUSTOM_DEFAULT_LOGIN_FAILED_LOCK_NUMBER: int = 10  # 默认用户登录失败锁定次数
+    CUSTOM_DEFAULT_LOGIN_FAILED_LOCK_MAX_AGE: int = 5  # 用户登录失败锁定时间(分钟)
     # 验证码配置
     CUSTOM_CAPTCHA_WIDTH: int = 180  # 验证码宽度
     CUSTOM_CAPTCHA_HEIGHT: int = 60  # 验证码高度
@@ -65,7 +81,7 @@ class BaseConifg(Config):
     # 密码加密配置
     CUSTOM_BCRYPT_ROUNDS: int = 8  # 迭代次数,越大耗时越长(好在python的bcrypt是C库)
     # Redis配置
-    CUSTOM_REDIS_HOST: str = "192.168.6.128"
+    CUSTOM_REDIS_HOST: str = "192.168.6.131"
     CUSTOM_REDIS_URL: str = f"redis://{CUSTOM_REDIS_HOST}"  # redis的url
     CUSTOM_REDIS_PSW: str = os.getenv("MY_APP_REDIS_PSW", "123456")  # redis的password
     CUSTOM_REDIS_PORT: int = 16379
@@ -75,7 +91,7 @@ class BaseConifg(Config):
     CUSTOM_JINJA2_TEM_PATH: str = f"{os.getcwd()}/app/jinja2_templates"
     # Tortoise-ORM 配置
     CUSTOM_ORM_ENGINE: str = "tortoise.backends.mysql"  # ORM引擎
-    CUSTOM_ORM_HOST: str = "192.168.6.128"
+    CUSTOM_ORM_HOST: str = "192.168.6.131"
     CUSTOM_ORM_PORT: int = 13306
     CUSTOM_ORM_USER: str = os.getenv("MY_APP_ORM_USER", "username")
     CUSTOM_ORM_PSW: str = os.getenv("MY_APP_ORM_PSW", "123456")
@@ -100,7 +116,7 @@ class BaseConifg(Config):
         "apps": {
             # 配置模型的相对位置,orm会自动进行查找
             "all_models": {
-                "models": ["app.orm.models.auth.user", "aerich.models"],
+                "models": ["app.orm.models.auth", "app.orm.models.system", "aerich.models"],
                 "default_connection": "master",
             },
         },

@@ -4,8 +4,8 @@
 
 from typing import List, Dict, Any, TypeVar, Optional
 from functools import wraps, lru_cache
-from jinja2 import Environment, PackageLoader, select_autoescape, FileSystemLoader
-from sanic.response import html, HTTPResponse
+from jinja2 import Environment, select_autoescape, FileSystemLoader
+from sanic.response import html
 from app.conf import get_config
 
 __all__ = [

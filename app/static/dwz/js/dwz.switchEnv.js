@@ -7,12 +7,21 @@
 			var $box = $(this);
 			$box.find("li>a").click(function(){
 				var $a = $(this);
-				$.post($a.attr("href"), {}, function(html){
+				$.get($a.attr("href"), function(html){
+					if (html.statusCode == 300 || html.statusCode == 301){
+						alertMsg.error(html.message || "出现错误了,但研发人员并未给出明确提示")
+					};
 					$("#sidebar").find(".accordion").remove().end().append(html).initUI();
 					$box.find("li").removeClass("selected");
 					$a.parent().addClass("selected");
 					navTab.closeAllTab();
 				});
+				// $.post($a.attr("href"), {}, function(html){
+				// 	$("#sidebar").find(".accordion").remove().end().append(html).initUI();
+				// 	$box.find("li").removeClass("selected");
+				// 	$a.parent().addClass("selected");
+				// 	navTab.closeAllTab();
+				// });
 				return false;
 			});
 		});
@@ -33,13 +42,21 @@
 			
 			$this.find(op.cities$).click(function(){
 				var $li = $(this);
-
-				$.post($li.find(">a").attr("href"), {}, function(html){
+				$.get($li.find(">a").attr("href"), function(html){
+					if (html[DWZ.keys.statusCode] == DWZ.statusCode.timeout){
+						alertMsg.error(html.message || "出现错误了,但研发人员并未给出明确提示")
+					};
 					_hide($this);
 					$this.find(op.boxTitle$).html($li.find(">a").html());
 					navTab.closeAllTab();
 					$("#sidebar").find(".accordion").remove().end().append(html).initUI();
 				});
+				// $.post($li.find(">a").attr("href"), {}, function(html){
+				// 	_hide($this);
+				// 	$this.find(op.boxTitle$).html($li.find(">a").html());
+				// 	navTab.closeAllTab();
+				// 	$("#sidebar").find(".accordion").remove().end().append(html).initUI();
+				// });
 				return false;
 			});
 		});

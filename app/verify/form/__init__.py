@@ -3,4 +3,4 @@
 # Desc:   表单验证汇总导出
 
 from .auth import LoginForm
-from .admin import UserAddForm
+from .admin import *

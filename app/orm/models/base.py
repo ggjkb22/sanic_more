@@ -2,7 +2,7 @@
 # Date:   2023-3-28
 # Desc:   orm基类模型
 
-from tortoise import fields,models
+from tortoise import fields, models
 
 
 class AbstractPKModel(models.Model):
@@ -16,7 +16,7 @@ class AbstractPKModel(models.Model):
     class Meta:
         # 抽象模型，不生成表
         abstract = True
-        
+
 
 class MixinTimeFiled:
     """
@@ -24,5 +24,5 @@ class MixinTimeFiled:
         1.创建时间与修改时间
         2.Tortoise的auto_now与auto_now_add参数,插入的是UTC时间
     """
-    create_datetime = fields.DatetimeField(auto_now_add=True,description='创建时间')
-    modify_datetime = fields.DatetimeField(auto_now=True,description='修改时间')
+    create_datetime = fields.DatetimeField(auto_now_add=True, description='创建时间')
+    modify_datetime = fields.DatetimeField(auto_now=True, description='修改时间')

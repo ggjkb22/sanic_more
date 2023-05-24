@@ -1,0 +1,13 @@
+<div class="accordion" fillSpace="sidebar">
+    <!-- 单个手风琴开始 -->
+    <div class="accordionHeader">
+        <h2><span>Folder</span>用户管理</h2>
+    </div>
+    <div class="accordionContent">
+        <ul class="tree treeFolder collapse">
+            <li><a href="{{ request.url_for('admin.user_table') }}" target="navTab" rel="admin_user_table">用户管理</a></li>
+            <li><a href="{{ request.url_for('admin.role_table') }}" target="navTab" rel="admin_role_table">角色管理</a></li>
+        </ul>
+    </div>
+    <!-- 单个手风琴结束 -->
+</div>

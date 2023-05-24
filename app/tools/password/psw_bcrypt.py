@@ -6,13 +6,13 @@ import bcrypt
 import asyncio
 from app.conf import get_config
 
-
 __all__ = [
     "hash_psw", "checkout_psw", "ahash_psw", "acheckout_psw"
 ]
 
 custom_config = get_config()
 salt = bcrypt.gensalt(rounds=custom_config.CUSTOM_BCRYPT_ROUNDS)
+
 
 def hash_psw(psw: str) -> str:
     """对密码进行hash"""

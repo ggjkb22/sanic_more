@@ -4,20 +4,25 @@
 
 from uuid import uuid4
 from sanic.request import Request
-from sanic.response import HTTPResponse
-from app.exception.csrf_exception import MtvCsrfValidateException
+from sanic.exceptions import SanicException
+from sanic.response import HTTPResponse, json
+from app.tools.template import jinja2_async_render
+from app.tools.captcha import aget_captcha_base64
 
 
 def generate_csrf_token(request: Request, response: HTTPResponse) -> HTTPResponse:
-    """生成csrf_token
+    """
+    生成csrf_token
     服务端存储在session中
     客户端存储在httponly cookie中
     """
+
     def set_csrf_token(csrf_token):
         # 客户端存储在httponly的cookies中
         response.cookies["csrf_token"] = csrf_token
         response.cookies["csrf_token"]["httponly"] = True
         response.cookies["csrf_token"]["max-age"] = 31536000
+
     # 如何session中已经存在csrf_token,则直接复用该token
     req_session_csrf_token = request.ctx.session.get("csrf_token")
     if req_session_csrf_token:
@@ -32,6 +37,49 @@ def generate_csrf_token(request: Request, response: HTTPResponse) -> HTTPRespons
     request.ctx.session["csrf_token"] = csrf_token
     set_csrf_token(csrf_token)
     return response
+
+
+class MtvCsrfValidateException(SanicException):
+    """MTV模式下的CSRF验证失败异常类"""
+    status_code = 400
+    message = "CsrfToken 验证失败"
+
+    @staticmethod
+    async def error_handler(request: Request, exception: SanicException):
+        """CSRF验证失败异常处理"""
+        try:
+            del request.ctx.session[request.app.config.CUSTOM_SESSION_CURRENT_USER]
+        except KeyError as e:
+            pass
+        request.ctx.session["captcha_str"], bs64_str = await aget_captcha_base64()
+        temp_ctx = {
+            "request": request,
+            "captcha_bs64": bs64_str,
+            "error": "Token验证失败, 请重新登录",
+        }
+        response = await jinja2_async_render("admin/login.html", ctx=temp_ctx)
+        # 生成并向session中注入csrf_token
+        generate_csrf_token(request, response)
+        return response
+    
+    @staticmethod
+    async def dwz_error_handler(request: Request, exception: SanicException):
+        """适配DWZ的CSRF验证失败异常处理"""
+        try:
+            del request.ctx.session[request.app.config.CUSTOM_SESSION_CURRENT_USER]
+        except KeyError as e:
+            pass
+        res_json = {
+            "statusCode": "406",
+            "message": "Token验证失败, 请重新登录",
+            "callbackType": "forwardError",
+            "errorMsg": "Token验证失败, 请重新登录",
+            "redirectUrl": request.url_for("auth.login")
+        }
+        response = await json(res_json)
+        # 生成并向session中注入csrf_token
+        generate_csrf_token(request, response)
+        return response
 
 
 def validate_csrf_token(request: Request):

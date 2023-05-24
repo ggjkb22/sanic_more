@@ -37,11 +37,11 @@
                 <form action="{{ request.url_for('auth.login') }}" method="post">
                     <p>
                         <label>用户名：</label>
-                        <input type="text" name="username" class="login_input" required minlength="3" maxlength="20" />
+                        <input type="text" name="username" class="login_input" required minlength="3" maxlength="20" {% if error %}value="{{ username }}"{% endif %} />
                     </p>
                     <p>
                         <label>密码：</label>
-                        <input type="password" name="password" class="login_input" maxlength="16"/>
+                        <input type="password" name="password" class="login_input" maxlength="16" {% if error %}value="{{ password }}"{% endif %}/>
                     </p>
                     <p>
                         <label>验证码：</label>
@@ -51,8 +51,8 @@
                         <img id="captcha" src="{{ captcha_bs64 }}" alt="验证码" width="141" height="50" />
                     </p>
                     {% if error %}
-                    <p style="margin: 15px 0;">
-                        <span style="color: red; padding: 10px; font-size: 13px;">提示：{{ error }}</span>
+                    <p style="margin-left: 12px;">
+                        <span style="color: red; font-size: 13px; line-height:20px;">提示：{{ error }}</span>
                     </p>
                     {% endif %}
                     <div class="login_bar">
@@ -62,7 +62,7 @@
             </div>
             <div class="login_banner"><img style="width: 950px; height: 270px;" src="{{ request.url_for('static', filename='dwz/themes/default/images/new_login_banner4.jpg') }}" /></div>
             <div class="login_main">
-                <ul class="helpList">
+                <ul class="helpList" style="margin-top: 30px;">
                     <li><a href="#">用户注册</a></li>
                     <li><a href="#">忘记密码</a></li>
                 </ul>
@@ -80,7 +80,7 @@
     $(function(){
         $("#captcha").click(function(){
             var this_self = $(this);
-            $.getJSON("{{ request.url_for('auth.captcha') }}",function(res_data, status){
+            $.get("{{ request.url_for('auth.captcha') }}?random=" + Math.random(),function(res_data, status){
                 if (status == "success"){
                     this_self.attr("src", res_data["data"]["captcha_bs64"])
                 };

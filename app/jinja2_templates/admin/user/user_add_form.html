@@ -1,5 +1,3 @@
-{% set min_psw = request.app.config.CUSTOM_MIN_PSW_LENGTH %}
-{% set max_psw = request.app.config.CUSTOM_MAX_PSW_LENGTH %}
 <h2 class="contentTitle">添加用户</h2>
 
 <div class="pageContent">
@@ -15,7 +13,7 @@
             <dl>
 				<dt>密码：</dt>
 				<dd>
-					<input id="w_validation_pwd" type="password" name="password" class="required alphanumeric" minlength="{{ min_psw }}" maxlength="{{ max_psw }}" alt="字母、数字、特殊字符 {{ min_psw }}-{{ max_psw }}位"/>
+					<input id="w_validation_pwd" type="password" name="password" class="required" minlength="{{ min_psw }}" maxlength="{{ max_psw }}" alt="大小写字母、数字、特殊字符 {{ min_psw }}-{{ max_psw }}位"/>
 				</dd>
 			</dl>
 			<dl>
@@ -33,8 +31,27 @@
 			<dl>
 				<dt>是否可用：</dt>
 				<dd>
-                    <label><input type="radio" name="can_use" value="1" checked/>是</label>
-                    <label><input type="radio" name="can_use" value="0"/>否</label>
+                    <select name="can_use" class="required combox">
+                        <option value="1" selected>是</option>
+                        <option value="0" >否</option>
+                    </select>
+				</dd>
+			</dl>
+            <dl>
+				<dt>角色：</dt>
+				<dd>
+					<div class="accordion" style="width:500px;float:left;">
+						<div class="accordionHeader">
+							<h2><span>icon</span>角色列表</h2>
+						</div>
+						<div class="accordionContent">
+							<ul class="tree treeFolder treeCheck">
+                                {% for role in roles %}
+								<li><a tname="roles" tvalue="{{ role['id'] }}" title="{{ role['name'] }}">{{ role['name'] }}</a></li>
+								{% endfor %}
+							</ul>
+						</div>
+					</div>
 				</dd>
 			</dl>
 		</div>

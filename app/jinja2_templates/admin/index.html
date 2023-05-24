@@ -19,8 +19,10 @@
 {% endblock head_css %}
 
 {% block head_js %}
-    <!--[if lt IE 9]><script src="{{ request.url_for('static', filename='dwz/js/speedup.js') }}" type="text/javascript"></script>
-<script src="{{ request.url_for('static', filename='dwz/js/jquery-1.12.4.js') }}" type="text/javascript"></script><![endif]-->
+    <!--[if lt IE 9]>
+		<script src="{{ request.url_for('static', filename='dwz/js/speedup.js') }}" type="text/javascript"></script>
+		<script src="{{ request.url_for('static', filename='dwz/js/jquery-1.12.4.js') }}" type="text/javascript"></script>
+	<![endif]-->
     <!--[if gte IE 9]><!-->
     <script src="{{ request.url_for('static', filename='dwz/js/jquery-3.4.1.js') }}" type="text/javascript"></script>
     <!--<![endif]-->
@@ -33,6 +35,9 @@
     <script type="text/javascript" src="{{ request.url_for('static', filename='dwz/chart/echarts.min.js') }}"></script>
     <script src="{{ request.url_for('static', filename='dwz/bin/new_dwz.min.js') }}" type="text/javascript"></script>
     <script src="{{ request.url_for('static', filename='dwz/js/dwz.regional.zh.js') }}" type="text/javascript"></script>
+    <script src="{{ request.url_for('static', filename='dwz/js/dwz.tree.js') }}" type="text/javascript"></script>
+
+
     <script type="text/javascript">
         $(function () {
             DWZ.init("{{ request.url_for('static', filename='dwz/dwz.frag.xml') }}", {
@@ -55,6 +60,11 @@
             });
         });
     </script>
+	{% if psw_expired %}
+	<script>
+		setTimeout('$("#user_psw_expired_modify").trigger("click");', 1000)
+	</script>
+	{% endif %}
 {% endblock head_js %}
 
 {% block body %}
@@ -64,10 +74,17 @@
 		<div id="header">
 			<!-- 右侧导航栏开始 -->
 			<div class="headerNav">
-				<a class="logo" href="http://j-ui.com">标志</a>
+                <a class="logo" href="javascript:;">标志</a>
+                <!--
+                <div style="float: left;width: 400px;height: 50px;">
+                    <div style="float: left;width: 50px;height: 50px; margin: 0 5px 0 10px;"><img style="width: 50px;height: 50px;" src="{{ request.url_for('static', filename='dwz/themes/default/images/new_logo.png') }}" alt="logo"></div>
+                    <h1 style="float: left; color: white; font-size: 20px; margin: 15px 5px;">内容管理系统--基于Sanic_More</h1>
+                </div>
+                -->
 				<ul class="nav">
-					<li id="switchEnvBox" style="color: white">您好, {{ user["username"] }}</li>
-					<li><a href="changepwd.html" target="dialog" width="600">修改密码</a></li>
+					<li style="color: white">您好, {{ user["username"] }}</li>
+					<li style="display: none;"><a id="user_psw_expired_modify" href="{{ request.url_for('admin.user_modify') }}?mode=expired" target="dialog" mask="true" minable="false" maxable="false" resizable="false" drawable="false" width="580" height="275" rel="user_psw_expired_modify">密码过期修改</a></li>
+					<li><a href="{{ request.url_for('admin.user_modify') }}" target="navTab" rel="user_modify">修改信息</a></li>
 					<li><a href="{{ request.url_for('auth.logout') }}">退出登录</a></li>
 				</ul>
 				<ul class="themeList" id="themeList">
@@ -83,12 +100,9 @@
 			<!-- 菜单栏开始 -->
 			<div id="navMenu">
 				<ul>
-					<li class="selected"><a href="asd"><span>资讯管理</span></a></li>
-					<li><a href="asdads" target="navTab"><span>订单管理</span></a></li>
-					<li><a href="sidebar_1.html"><span>产品管理</span></a></li>
-					<li><a href="sidebar_2.html"><span>会员管理</span></a></li>
-					<li><a href="sidebar_1.html"><span>服务管理</span></a></li>
-					<li><a href="sidebar_2.html"><span>系统设置</span></a></li>
+					<li class="selected"><a href="{{ request.url_for('admin.index_menu') }}"><span>首页</span></a></li>
+					<li><a href="{{ request.url_for('admin.user_menu') }}"><span>用户管理</span></a></li>
+					<li><a href="{{ request.url_for('admin.system_menu') }}"><span>系统配置</span></a></li>
 				</ul>
 			</div>
 			<!-- 菜单栏结束 -->
@@ -102,20 +116,10 @@
 				</div>
 			</div>
 			<div id="sidebar">
-				<div class="toggleCollapse"><div>收缩</div></div>
-
-				<div class="accordion" fillSpace="sidebar">
-					<!-- 单个手风琴开始 -->
-					<div class="accordionHeader">
-						<h2><span>Folder</span>用户管理</h2>
-					</div>
-					<div class="accordionContent">
-						<ul class="tree treeFolder collapse">
-							<li><a href="{{ request.url_for('admin.user_table') }}" target="navTab" rel="admin_user_table">用户</a></li>
-						</ul>
-					</div>
-					<!-- 单个手风琴结束 -->
-				</div>
+				<div class="toggleCollapse"><h2>菜单</h2><div>收缩</div></div>
+                <!-- menu替换部分开始 -->
+				{% include "admin/index_menu.html" %}
+                <!-- menu替换部分开始 -->
 			</div>
 		</div>
 		<!-- 左侧边栏结束 -->
@@ -123,9 +127,10 @@
 		<div id="container">
 			<div id="navTab" class="tabsPage">
 				<div class="tabsPageHeader">
-					<div class="tabsPageHeaderContent"><!-- 显示左右控制时添加 class="tabsPageHeaderMargin" -->
+					<div class="tabsPageHeaderContent tabsPageHeaderMargin"><!-- 显示左右控制时添加 class="tabsPageHeaderMargin" -->
 						<ul class="navTab-tab">
-							<li tabid="main" class="main"><a href="javascript:;"><span><span class="home_icon">主页</span></span></a></li>
+							<!-- 打开的NavID会动态地加载在这边 -->
+                            <li tabid="main" class="main"><a href="javascript:;"><span><span class="home_icon">我的主页</span></span></a></li>
 						</ul>
 					</div>
 					<div class="tabsLeft">left</div><!-- 禁用只需要添加一个样式 class="tabsLeft tabsLeftDisabled" -->
@@ -134,25 +139,14 @@
 				</div>
 				<!-- Tab的侧边汇总开始 -->
 				<ul class="tabsMoreList">
-					<li><a href="javascript:;">主页</a></li>
+					<!-- 打开的NavID也会动态地加载在这边 -->
+                    <li><a href="javascript:;">我的主页</a></li>
 				</ul>
 				<!-- Tab的侧边汇总结束 -->
 				<!-- 动态更新区域开始 -->
 				<div class="navTab-panel tabsPageContent layoutBox">
-					<div class="page unitBox">
-						<div class="accountInfo">
-							<div class="alertInfo">
-								<h2><a href="doc/dwz-user-guide.pdf" target="_blank">DWZ框架使用手册(PDF)</a></h2>
-								<a href="doc/dwz-user-guide.swf" target="_blank">DWZ框架演示视频</a>
-							</div>
-							<div class="right">
-								<p><a href="doc/dwz-user-guide.zip" target="_blank" style="line-height:19px">DWZ框架使用手册(CHM)</a></p>
-								<p><a href="doc/dwz-ajax-develop.swf" target="_blank" style="line-height:19px">DWZ框架Ajax开发视频教材</a></p>
-							</div>
-							<p><span>DWZ富客户端框架</span></p>
-							<p>DWZ官方微博:<a href="http://weibo.com/dwzui" target="_blank">http://weibo.com/dwzui</a></p>
-						</div>
-					</div>
+					<!-- 打开的Nav会动态地加载在这边 -->
+                    <div class="pageContent"></div>
 				</div>
 				<!-- 动态更新区域结束 -->
 			</div>

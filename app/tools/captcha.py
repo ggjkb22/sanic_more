@@ -45,7 +45,7 @@ class GenerateCaptcha:
         draw = ImageDraw.Draw(self.image)
         self._generate_char()
         # 向画布上填写验证码
-        for i in range(4):
+        for i in range(self.length):
             draw.text((40 * i + 10, 10), self.char_res[i], font=font, fill=self._random_color())
         # 向画布上填填充噪点
         for x in range(random.randint(200, 600)):

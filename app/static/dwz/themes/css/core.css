@@ -188,8 +188,8 @@ a:hover {text-decoration:underline;}
 /* Tree */
 .tree li { clear:both; display:block; line-height:22px; cursor:pointer;}
 .tree div, .tree a, .tree span { display:inherit; height:22px; line-height:22px;}
-.tree div { display:block; overflow:hidden;}
-.tree div div { float:left; display:block; overflow:hidden; width:22px; height:22px; border:none; background-position:0 -100px;}
+.tree div { display:block; white-space:nowrap;}
+.tree div div { float:left; display:block; overflow:auto; white-space:nowrap; width:22px; height:22px; border:none; background-position:0 -100px;}
 .tree a, .tree a:hover { text-decoration:none;}
 
 .tree .collapsable { background-position:0 -300px;}
@@ -488,7 +488,7 @@ body { overflow:hidden;}
 .searchBar label { float:left; width:80px; padding:0 5px; line-height:23px;}
 .searchBar .searchContent td{padding-right:20px; white-space:nowrap; height:25px}
 .searchBar .subBar { height:25px;}
-.searchBar .subBar ul { float:right;}
+.searchBar .subBar ul { float:right; margin-right: 20px;}
 .searchBar .subBar li { float:left; margin-left:5px;}
 .pageContent { display:block;overflow:auto;position:relative;}
 
@@ -511,7 +511,8 @@ body { overflow:hidden;}
 .pageFormContent span.info{color:#7F7F7F;display:block;line-height:21px;float:left;}
 
 .pageFormContent dl { float:left; display:block; width:380px; height:21px; margin:0; padding:5px 0; position:relative;}
-.pageFormContent dt { float:left; width:120px; padding:0 5px; line-height:21px;}
+.pageFormContent dt { float:left; width:120px; padding:0 5px; line-height:20px;}
+.pageFormContent.wider dt { float:left; width:140px; padding:0 5px; line-height:20px;}
 .pageFormContent dd {display:block;line-height:21px;width:220px;float:left;}
 .pageFormContent dl.nowrap, .nowrap dl{width:100%; height:auto; clear: both;}
 .pageFormContent dl.nowrap dd, .nowrap dd {width: 560px;}
@@ -606,7 +607,7 @@ a.btnView{background-position: -115px 0}
 a.btnEdit{background-position: -138px 0}
 a.btnSelect{background-position: -92px 0}
 a.btnLook{background-position: -161px 0}
-a.btnAttach{background-position: -183px 0}
+a.btnAttach{background-position: -183px 0;color: #0e90d2;}
 .center {text-align: center;}
 .center a.btnAdd, .center a.btnDel, .center a.btnView, .center a.btnEdit, .center a.btnSelect, .center a.btnInfo, 
 .center a.btnAssign, .center a.btnLook, .center a.btnAttach {display:inline-block;float:none}

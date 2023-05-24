@@ -1,0 +1,80 @@
+<form id="pagerForm" method="post" action="#rel#">
+	<input type="hidden" name="pageNum" value="1" />
+	<input type="hidden" name="numPerPage" value="100" />
+	<input type="hidden" name="orderField" value="客户号" />
+	<input type="hidden" name="orderDirection" value="desc" />
+</form>
+
+<div class="pageHeader">
+	<form id="mySearchForm" rel="pagerForm" onsubmit="return navTabSearch(this);" action="w_removeSelected.html" method="post">
+	<div class="searchBar">
+		<ul class="searchContent">
+			<li>
+				<label>关键词：</label>
+				<input type="text" name="keywords" value=""/>
+			</li>
+		</ul>
+		<div class="subBar">
+			<ul>
+				<li><div class="buttonActive"><div class="buttonContent"><button type="submit">检索</button></div></div></li>
+				<li><a class="button" href="demo_page6.html" target="dialog" mask="true" title="查询框"><span>高级检索</span></a></li>
+			</ul>
+		</div>
+	</div>
+	</form>
+</div>
+<div class="pageContent">
+	<div class="panelBar">
+		<ul class="toolBar">
+			<li><a class="add" href="{{ request.url_for('admin.role_add') }}" target="navTab" rel="role_add" title="添加角色"><span>添加</span></a></li>
+			<li><a title="确定要删除这些角色吗?" target="selectedTodo" rel="role_ids" href="{{ request.url_for('admin.role_del') }}" class="delete"><span>删除选中</span></a></li>
+			<li><a class="edit" href="{{ request.url_for('admin.role_modify') }}?role_id={sid_role}" target="navTab" rel="role_modify" title="修改角色" warn="请选择一个角色"><span>修改</span></a></li>
+			<li class="line">line</li>
+			<li><a class="icon" href="demo/common/dwz-team.xls" target="dwzExport" targetType="navTab" title="实要导出这些记录吗?"><span>导出EXCEL</span></a></li>
+		</ul>
+	</div>
+	<table class="table" width="1200" layoutH="138">
+		<thead>
+			<tr>
+				<th width="2"><input type="checkbox" group="role_ids" class="checkboxCtrl"></th>
+				<th width="15" orderField="accountNo" class="asc">序号</th>
+				<th width="50" orderField="accountNo" class="asc">角色名</th>
+				<th width="70">描述</th>
+				<th width="50">创建日期</th>
+				<th width="50">最后修改日期</th>
+				<th width="70">操作</th>
+			</tr>
+		</thead>
+		<tbody>
+            {% for role in roles %}
+			<tr target="sid_role" rel="{{ role['id'] }}">
+				<td><input name="role_ids" value="{{ role['id'] }}" title="角色ID：{{ role['id'] }}" type="checkbox"></td>
+				<td>{{ loop.index }}</td>
+				<td>{{ role["name"] }}</td>
+				<td>{{ role["description"] | default('', boolean=True)}}</td>
+				<td>{{ role["create_datetime"].strftime('%Y-%m-%d %H:%M:%S') }}</td>
+				<td>{{ role["modify_datetime"].strftime('%Y-%m-%d %H:%M:%S') }}</td>
+				<td>
+					<a title="删除" target="ajaxTodo" href="{{ request.url_for('admin.role_del') }}?role_id={{ role['id'] }}" class="btnDel">删除</a>
+					<a title="修改角色" target="navTab" rel="role_modify" href="{{ request.url_for('admin.role_modify') }}?role_id={{ role['id'] }}" class="btnEdit">编辑</a>
+				</td>
+			</tr>
+            {% endfor %}
+		</tbody>
+	</table>
+	<div class="panelBar">
+		<div class="pages">
+			<span>显示</span>
+			<select class="combox" name="numPerPage" onchange="navTabPageBreak({numPerPage:this.value})">
+				<option value="20">20</option>
+				<option value="50">50</option>
+				<option value="100">100</option>
+				<option value="200">200</option>
+			</select>
+			<span>条，共{{ role_total }}条</span>
+		</div>
+
+		<div class="pagination" targetType="navTab" totalCount="{{ role_total }}" numPerPage="20" pageNumShown="20" currentPage="1"></div>
+
+	</div>
+</div>

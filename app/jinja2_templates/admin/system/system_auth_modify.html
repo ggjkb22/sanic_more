@@ -1,0 +1,71 @@
+<h2 class="contentTitle">修改认证配置</h2>
+
+<div class="pageContent">
+
+	<form method="post" action="{{ request.url_for('admin.system_auth_modify') }}" class="pageForm required-validate" onsubmit="return validateCallback(this, navTabAjaxDone)">
+		<div class="pageFormContent nowrap wider" layoutH="97">
+			<dl>
+				<dt>密码最小长度：</dt>
+				<dd>
+					<input type="number" name="min_psw_length" class="required" value="{{ settings['min_psw_length'] }}" max="16" min="6"/>
+				</dd>
+			</dl>
+			<dl>
+				<dt>密码最大长度：</dt>
+				<dd>
+					<input type="number" name="max_psw_length" class="required" value="{{ settings['max_psw_length'] }}" max="16" min="6"/>
+				</dd>
+			</dl>
+			<dl>
+				<dt>开启密码使用期限：</dt>
+				<dd>
+                    <select name="psw_change_max_age_enable" class="required combox">
+                        <option value="1" {% if settings['psw_change_max_age_enable'] %}selected{% endif %}>是</option>
+                        <option value="0" {% if not settings['psw_change_max_age_enable'] %}selected{% endif %}>否</option>
+                    </select>
+				</dd>
+			</dl>
+            <dl>
+				<dt>密码使用期限(天)：</dt>
+				<dd>
+					<input type="number" name="psw_change_max_age" class="required" min="0" max="90" value="{{ settings['psw_change_max_age'] }}"/>
+				</dd>
+			</dl>
+            <dl>
+				<dt>会话空闲登出时间(分钟)：</dt>
+				<dd>
+					<input type="number" name="session_idle_logout_max_age" class="required" min="1" max="43200" value="{{ settings['session_idle_logout_max_age'] }}"/>
+				</dd>
+			</dl>
+            <dl>
+				<dt>用户登录失败锁定策略：</dt>
+				<dd>
+                    <select name="login_failed_lock_policy" class="required combox">
+                        <option value="0" {% if settings['login_failed_lock_policy'] == 0 %}selected{% endif %}>不锁定</option>
+                        <option value="1" {% if settings['login_failed_lock_policy'] == 1 %}selected{% endif %}>锁定IP与用户</option>
+                        <option value="2" {% if settings['login_failed_lock_policy'] == 2 %}selected{% endif %}>锁定IP</option>
+                    </select>
+				</dd>
+			</dl>
+            <dl>
+				<dt>登录失败锁定次数：</dt>
+				<dd>
+					<input type="number" name="login_failed_lock_number" class="required" min="1" max="20" value="{{ settings['login_failed_lock_number'] }}"/>
+				</dd>
+			</dl>
+            <dl>
+				<dt>登录失败锁定时间(分钟)：</dt>
+				<dd>
+					<input type="number" name="login_failed_lock_max_age" class="required" min="1" max="60" value="{{ settings['login_failed_lock_max_age'] }}"/>
+				</dd>
+			</dl>
+		</div>
+		<div class="formBar">
+			<ul>
+				<li><div class="buttonActive"><div class="buttonContent"><button type="submit">提交</button></div></div></li>
+				<li><div class="button"><div class="buttonContent"><button type="button" class="close">取消</button></div></div></li>
+			</ul>
+		</div>
+	</form>
+
+</div>

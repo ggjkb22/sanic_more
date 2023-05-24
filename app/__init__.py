@@ -11,7 +11,7 @@ from .bp import register_bp
 custom_config = get_config()
 
 # 初始化 Sanic 实例
-app = Sanic(name="Sanic_Portal", config=custom_config)
+app = Sanic(name=custom_config.CUSTOM_APP_NAME, config=custom_config)
 
 # 注册全局监听器
 register_listener(app)

@@ -1,0 +1,14 @@
+{#菜单权限递归#}
+{% macro menu_permissions_recursion(menu_permissions, checked_list=[]) %}
+    {% for menu_permission in menu_permissions %}
+        <li><a tname="menu_permissions" tvalue="{{ menu_permission['code'] }}" title="{{ menu_permission['name'] }}"
+               {% if checked_list and menu_permission["code"] in checked_list %}checked="true"{% endif %}
+               rel="{{ menu_permission['code'] }}">{{ menu_permission['name'] }}</a>
+            {% if menu_permission["childrens"] %}
+                <ul>
+                    {{ menu_permissions_recursion(menu_permission["childrens"], checked_list=checked_list) }}
+                </ul>
+            {% endif %}
+        </li>
+    {% endfor %}
+{% endmacro %}

@@ -4,7 +4,7 @@
 
 from uuid import uuid4
 from sanic.request import Request
-from app.exception.csrf_exception import MtvCsrfValidateException
+from app.tools.csrf_protect import MtvCsrfValidateException
 
 
 async def mtv_csrf_protect(request: Request):

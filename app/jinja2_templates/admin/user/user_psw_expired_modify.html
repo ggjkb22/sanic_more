@@ -1,0 +1,38 @@
+<div class="pageContent">
+    <form method="post" action="{{ request.url_for('admin.user_psw_modify') }}" class="pageForm required-validate" onsubmit="return validateCallback(this, dialogAjaxDone)">
+        <div class="pageFormContent nowrap">
+            <label style="color: red; width: 200px;">您的密码已过期，请修改密码！</label>
+            <p>
+                <label style="width: 70px;">用户ID：</label>
+                    <input type="text" name="user_id" value="{{ user.pk }}" class="textInput"
+                           readonly="true"/>
+            </p>
+            <dl>
+                <label style="width: 70px;">用户名：</label>
+                    <input type="text" name="username" maxlength="20" value="{{ user.username }}"
+                           class="textInput" readonly="true"/>
+            </dl>
+            <dl>
+                <label style="width: 70px;">旧密码：</label>
+                    <input type="password" name="old_password" class="required"/>
+            </dl>
+            <dl>
+                <label style="width: 70px;">新密码：</label>
+                    <input id="w_validation_new_pwd" type="password" name="new_password" class="required"
+                           minlength="{{ min_psw }}" maxlength="{{ max_psw }}"
+                           alt="大小写字母、数字、特殊字符 {{ min_psw }}-{{ max_psw }}位"/>
+            </dl>
+            <dl>
+                <label style="width: 70px;">确认密码：</label>
+                    <input type="password" name="repassword" class="required" equalto="#w_validation_new_pwd"/>
+            </dl>
+        </div>
+		<div class="formBar">
+			<ul>
+				<li><div class="buttonActive"><div class="buttonContent"><button type="submit">提交</button></div></div></li>
+				<li><div class="button"><div class="buttonContent"><button type="button" class="close">取消</button></div></div></li>
+			</ul>
+		</div>
+    </form>
+
+</div>
