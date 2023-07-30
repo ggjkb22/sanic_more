@@ -1,0 +1,6 @@
+.idea/
+sanic_virtual/
+sanic_more/app/conf/.env
+__pycache__/
+migrations/
+pyproject.toml
